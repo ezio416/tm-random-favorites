@@ -1,8 +1,9 @@
 [meta]
 name = "Random Favorites"
 author = "Ezio"
-category = "Developer"
+category = "Utilities"
 version = "0.1.0"
+siteid = 499
 
 [script]
 dependencies = [ "NadeoServices" ]
