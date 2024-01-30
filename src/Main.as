@@ -1,8 +1,11 @@
 dictionary@  accounts            = dictionary();
 const string audienceLive        = "NadeoLiveServices";
+string       authorSearch;
 bool         getting             = false;
 bool         loadingMap          = false;
 Map@[]       maps;
+Map@[]       mapsFiltered;
+string       mapSearch;
 bool         permissionPlayLocal = false;
 const float  scale               = UI::GetScale();
 const vec2   confirmButtonSize   = vec2(scale * 110.0f, scale * 25.0f);
@@ -57,7 +60,7 @@ void Render() {
 
     UI::Begin(title, S_Show, UI::WindowFlags::None);
         UI::BeginDisabled(getting);
-        if (UI::Button(Icons::Refresh + " Refresh favorites"))
+        if (UI::Button(Icons::Refresh + " Refresh favorites (" + maps.Length + ")"))
             startnew(GetFavoriteMaps);
         UI::EndDisabled();
 
@@ -66,6 +69,36 @@ void Render() {
         if (UI::Button(Icons::Play + " Play random map"))
             startnew(PlayRandomMap);
         UI::EndDisabled();
+
+        if (S_MapSearch) {
+            mapSearch = UI::InputText("search maps", mapSearch, false);
+
+            if (mapSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search##mapSearchClear"))
+                    mapSearch = "";
+
+                UI::SameLine();
+                UI::Text(mapsFiltered.Length + " result" + (mapsFiltered.Length == 1 ? "" : "s"));
+            }
+        } else
+            mapSearch = "";
+
+        if (S_AuthorSearch) {
+            authorSearch = UI::InputText("search authors", authorSearch, false);
+
+            if (authorSearch != "") {
+                UI::SameLine();
+                if (UI::Button(Icons::Times + " Clear Search##authorSearchClear"))
+                    authorSearch = "";
+
+                UI::SameLine();
+                UI::Text(mapsFiltered.Length + " result" + (mapsFiltered.Length == 1 ? "" : "s"));
+            }
+        } else
+            authorSearch = "";
+
+        FilterMaps();
 
         UI::Text("Click a map name to play it:");
 
@@ -83,42 +116,45 @@ void Render() {
             UI::TableSetupColumn("bronzeTime", UI::TableColumnFlags::WidthFixed, scale * 75.0f);
             UI::TableHeadersRow();
 
-            for (uint i = 0; i < maps.Length; i++) {
-                Map@ map = maps[i];
+            UI::ListClipper clipper(mapsFiltered.Length);
+            while (clipper.Step()) {
+                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++) {
+                    Map@ map = mapsFiltered[i];
 
-                UI::TableNextRow();
+                    UI::TableNextRow();
 
-                if (S_Hearts) {
-                    UI::TableNextColumn();
-                    UI::BeginDisabled(getting);
-                    string icon = map.favorite ? Icons::Heart : Icons::HeartO;
-                    if (UI::Button(icon + "##" + map.uid, Draw::MeasureString(icon) + vec2(scale * 15.0f, scale * 10.0f))) {
-                        @selectedFavorite = map;
-                        startnew(FavoriteToggle);
+                    if (S_Hearts) {
+                        UI::TableNextColumn();
+                        UI::BeginDisabled(getting);
+                        string icon = map.favorite ? Icons::Heart : Icons::HeartO;
+                        if (UI::Button(icon + "##" + map.uid, Draw::MeasureString(icon) + vec2(scale * 15.0f, scale * 10.0f))) {
+                            @selectedFavorite = map;
+                            startnew(FavoriteToggle);
+                        }
+                        UI::EndDisabled();
                     }
+
+                    UI::TableNextColumn();
+                    UI::BeginDisabled(!permissionPlayLocal || loadingMap);
+                    if (UI::Selectable(S_ColorMapNames ? map.nameColored : map.nameClean, false))
+                        startnew(CoroutineFunc(map.Play));
                     UI::EndDisabled();
+
+                    UI::TableNextColumn();
+                    UI::Text(accounts.Exists(map.authorId) ? string(accounts[map.authorId]) : "");
+
+                    UI::TableNextColumn();
+                    UI::Text(Time::Format(map.authorTime));
+
+                    UI::TableNextColumn();
+                    UI::Text(Time::Format(map.goldTime));
+
+                    UI::TableNextColumn();
+                    UI::Text(Time::Format(map.silverTime));
+
+                    UI::TableNextColumn();
+                    UI::Text(Time::Format(map.bronzeTime));
                 }
-
-                UI::TableNextColumn();
-                UI::BeginDisabled(!permissionPlayLocal || loadingMap);
-                if (UI::Selectable(S_ColorMapNames ? map.nameColored : map.nameClean, false))
-                    startnew(CoroutineFunc(map.Play));
-                UI::EndDisabled();
-
-                UI::TableNextColumn();
-                UI::Text(accounts.Exists(map.authorId) ? string(accounts[map.authorId]) : "");
-
-                UI::TableNextColumn();
-                UI::Text(Time::Format(map.authorTime));
-
-                UI::TableNextColumn();
-                UI::Text(Time::Format(map.goldTime));
-
-                UI::TableNextColumn();
-                UI::Text(Time::Format(map.silverTime));
-
-                UI::TableNextColumn();
-                UI::Text(Time::Format(map.bronzeTime));
             }
 
             UI::PopStyleColor();
@@ -148,4 +184,27 @@ void RenderConfirmation() {
             showConfirmation = false;
 
     UI::End();
+}
+
+void FilterMaps() {
+    if (mapSearch.Length == 0 && authorSearch.Length == 0) {
+        mapsFiltered = maps;
+        return;
+    }
+
+    const string mapSearchLower = mapSearch.ToLower();
+    const string authorSearchLower = authorSearch.ToLower();
+
+    mapsFiltered.RemoveRange(0, mapsFiltered.Length);
+
+    for (uint i = 0; i < maps.Length; i++) {
+        Map@ map = maps[i];
+        const string authorName = accounts.Exists(map.authorId) ? string(accounts[map.authorId]) : "";
+
+        if (
+            (mapSearchLower.Length == 0 || map.nameClean.ToLower().Contains(mapSearchLower)) &&
+            (authorSearchLower.Length == 0 || authorName.ToLower().Contains(authorSearchLower))
+        )
+            mapsFiltered.InsertLast(map);
+    }
 }

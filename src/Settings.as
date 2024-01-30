@@ -14,8 +14,14 @@ bool S_HideWithGame = true;
 [Setting category="Window" name="Show/hide with Openplanet UI"]
 bool S_HideWithOP = true;
 
+[Setting category="Window" name="Show map search field"]
+bool S_MapSearch = true;
+
+[Setting category="Window" name="Show author search field"]
+bool S_AuthorSearch = true;
+
 [Setting category="Window" name="Show buttons to add/remove favorites"]
-bool S_Hearts = false;
+bool S_Hearts = true;
 
 [Setting category="Window" name="Show map names with color"]
 bool S_ColorMapNames = true;
