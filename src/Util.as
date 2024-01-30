@@ -1,8 +1,8 @@
 // c 2024-01-29
 // m 2024-01-30
 
-uint64 latestNandoRequest   = 0;
-uint   nandoRequestWaitTime = 1000;
+uint64     latestNandoRequest   = 0;
+const uint nandoRequestWaitTime = 1000;
 
 void FilterMaps() {
     if (mapSearch.Length == 0 && authorSearch.Length == 0) {
