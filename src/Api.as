@@ -12,6 +12,9 @@ void GetAccountNames() {
             namesToGet.InsertLast(keys[i]);
     }
 
+    if (namesToGet.Length == 0)
+        return;
+
     trace("getting names for " + namesToGet.Length + " accounts");
 
     dictionary@ returned = NadeoServices::GetDisplayNamesAsync(namesToGet);
@@ -27,6 +30,8 @@ void GetFavoriteMaps() {
         return;
 
     getting = true;
+
+    trace("getting favorites");
 
     while (!NadeoServices::IsAuthenticated(audienceLive))
         yield();
@@ -73,6 +78,8 @@ void GetFavoriteMaps() {
     } catch {
         warn("GetFavoriteMaps exception: " + getExceptionInfo());
     }
+
+    trace("getting favorites done (" + maps.Length + ")");
 
     getting = false;
 }

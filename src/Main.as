@@ -36,7 +36,7 @@ void RenderMenu() {
         if (UI::MenuItem(Icons::Refresh + " Refresh favorites (" + maps.Length + ")", "", false, !getting))
             startnew(GetFavoriteMaps);
 
-        if (UI::MenuItem(Icons::Play + " Play random map", "", false, canPlay && maps.Length > 0 && !loadingMap))
+        if (UI::MenuItem(Icons::Play + " Play random map", "", false, !getting && canPlay && maps.Length > 0 && !loadingMap))
             startnew(PlayRandomMap);
 
         UI::EndMenu();
