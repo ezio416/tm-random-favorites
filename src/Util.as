@@ -14,7 +14,7 @@ void NandoRequestWait() {
 }
 
 void PlayRandomMap() {
-    if (!canPlay || maps.Length == 0)
+    if (!permissionPlayLocal || maps.Length == 0)
         return;
 
     string currentUid;

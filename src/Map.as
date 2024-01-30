@@ -1,9 +1,9 @@
 class Map {
     string authorId;
-    string authorName;
     uint   authorTime;
     uint   bronzeTime;
     string downloadUrl;
+    bool   favorite;
     uint   goldTime;
     string id;
     string nameClean;
@@ -19,11 +19,13 @@ class Map {
     uint   uploadTimestamp;
 
     Map() { }
+    // Map(const string &in uid) { this.uid = uid; }
     Map(Json::Value@ json) {
         authorId        = json["author"];
         authorTime      = json["authorTime"];
         bronzeTime      = json["bronzeTime"];
         downloadUrl     = json["downloadUrl"];
+        favorite        = json["favorite"];
         goldTime        = json["goldTime"];
         id              = json["mapId"];
         nameRaw         = json["name"];
@@ -40,7 +42,7 @@ class Map {
 
     // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
     void Play() {
-        if (loadingMap || !canPlay)
+        if (loadingMap || !permissionPlayLocal)
             return;
 
         loadingMap = true;
@@ -67,5 +69,34 @@ class Map {
         nameClean = StripFormatCodes(nameRaw).Trim();
         nameColored = ColoredString(nameRaw).Trim();
         nameQuoted = "\"" + nameClean + "\"";
+    }
+
+    Json::Value@ ToJson() {
+        Json::Value@ ret;
+
+        ret["authorId"]        = authorId;
+        ret["authorTime"]      = authorTime;
+        ret["bronzeTime"]      = bronzeTime;
+        ret["downloadUrl"]     = downloadUrl;
+        ret["favorite"]        = favorite;
+        ret["goldTime"]        = goldTime;
+        ret["id"]              = id;
+        ret["nameClean"]       = nameClean;
+        ret["nameColored"]     = nameColored;
+        ret["nameQuoted"]      = nameQuoted;
+        ret["nameRaw"]         = nameRaw;
+        ret["nbLaps"]          = nbLaps;
+        ret["silverTime"]      = silverTime;
+        ret["submitter"]       = submitter;
+        ret["thumbnailUrl"]    = thumbnailUrl;
+        ret["uid"]             = uid;
+        ret["updateTimestamp"] = updateTimestamp;
+        ret["uploadTimestamp"] = uploadTimestamp;
+
+        return ret;
+    }
+
+    string ToString() {
+        return Json::Write(ToJson());
     }
 }
