@@ -4,16 +4,16 @@
 dictionary@  accounts            = dictionary();
 const string audienceLive        = "NadeoLiveServices";
 string       authorSearch;
+vec2         confirmButtonSize   = vec2(1.0f, 1.0f);
+int          confirmWindowX      = 0;
+int          confirmWindowY      = 0;
 bool         getting             = false;
 bool         loadingMap          = false;
 Map@[]       maps;
 Map@[]       mapsFiltered;
 string       mapSearch;
 bool         permissionPlayLocal = false;
-const float  scale               = UI::GetScale();
-const vec2   confirmButtonSize   = vec2(scale * 110.0f, scale * 25.0f);
-const int    confirmWindowX      = int((Draw::GetWidth() / 2 - confirmButtonSize.x - 19.0f) / scale);
-const int    confirmWindowY      = int((Draw::GetHeight() / 2 - 200.0f) / scale);
+float        scale               = 1.0f;
 const string title               = "\\$FF0" + Icons::Random + "\\$G Random Favorites";
 
 void Main() {
@@ -32,6 +32,12 @@ void Main() {
 
     if (S_Auto)
         startnew(GetFavoriteMaps);
+
+    // these somehow aren't properly initialized unless plugin is manually reloaded, so they're here instead
+    scale = UI::GetScale();
+    confirmButtonSize = vec2(scale * 110.0f, scale * 25.0f);
+    confirmWindowX = int((Draw::GetWidth() / 2 - confirmButtonSize.x - 19.0f) / scale);
+    confirmWindowY = int((Draw::GetHeight() / 2 - 200.0f) / scale);
 }
 
 void RenderMenu() {
@@ -50,13 +56,12 @@ void RenderMenu() {
 }
 
 void Render() {
+    if ((S_HideWithGame && !UI::IsGameUIVisible()) || (S_HideWithOP && !UI::IsOverlayShown()))
+        return;
+
     RenderConfirmation();
 
-    if (
-        !S_Show ||
-        (S_HideWithGame && !UI::IsGameUIVisible()) ||
-        (S_HideWithOP && !UI::IsOverlayShown())
-    )
+    if (!S_Show)
         return;
 
     UI::SetNextWindowSize(650, 300, UI::Cond::FirstUseEver);
@@ -174,8 +179,8 @@ void RenderConfirmation() {
     UI::SetNextWindowPos(confirmWindowX, confirmWindowY);
 
     UI::Begin(title + " Confirmation", showConfirmation, UI::WindowFlags::NoTitleBar | UI::WindowFlags::AlwaysAutoResize);
-        UI::Text("Are you sure you want to remove the\nfollowing map from your favorites?\nIt may be difficult to find again:");
-        UI::TextWrapped(selectedFavorite.nameQuoted + "\n");
+        UI::Text("Are you sure you want to remove the\nfollowing map from your favorites?\nIt may be difficult to find it again:");
+        UI::TextWrapped(selectedFavorite.nameQuoted);
 
         if (UI::ButtonColored("YES", 0.35f, 1.0f, 0.6f, confirmButtonSize)) {
             confirmed = true;
