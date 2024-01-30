@@ -185,26 +185,3 @@ void RenderConfirmation() {
 
     UI::End();
 }
-
-void FilterMaps() {
-    if (mapSearch.Length == 0 && authorSearch.Length == 0) {
-        mapsFiltered = maps;
-        return;
-    }
-
-    const string mapSearchLower = mapSearch.ToLower();
-    const string authorSearchLower = authorSearch.ToLower();
-
-    mapsFiltered.RemoveRange(0, mapsFiltered.Length);
-
-    for (uint i = 0; i < maps.Length; i++) {
-        Map@ map = maps[i];
-        const string authorName = accounts.Exists(map.authorId) ? string(accounts[map.authorId]) : "";
-
-        if (
-            (mapSearchLower.Length == 0 || map.nameClean.ToLower().Contains(mapSearchLower)) &&
-            (authorSearchLower.Length == 0 || authorName.ToLower().Contains(authorSearchLower))
-        )
-            mapsFiltered.InsertLast(map);
-    }
-}
