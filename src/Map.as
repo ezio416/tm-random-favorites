@@ -66,8 +66,8 @@ class Map {
 
     void SetNames() {
         nameRaw = nameRaw.Trim();
-        nameClean = StripFormatCodes(nameRaw).Trim();
-        nameColored = ColoredString(nameRaw).Trim();
+        nameClean = Text::StripFormatCodes(nameRaw).Trim();
+        nameColored = Text::OpenplanetFormatCodes(nameRaw).Trim();
         nameQuoted = "\"" + nameClean + "\"";
     }
 

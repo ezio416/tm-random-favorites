@@ -9,8 +9,8 @@ Map@[]       mapsFiltered;
 bool         permissionPlayLocal = false;
 const float  scale               = UI::GetScale();
 const vec2   confirmButtonSize   = vec2(scale * 110.0f, scale * 25.0f);
-const int    confirmWindowX      = int((Draw::GetWidth() / 2 - confirmButtonSize.x - 19.0f) / scale);
-const int    confirmWindowY      = int((Draw::GetHeight() / 2 - 200.0f) / scale);
+const int    confirmWindowX      = int((Display::GetWidth() / 2 - confirmButtonSize.x - 19.0f) / scale);
+const int    confirmWindowY      = int((Display::GetHeight() / 2 - 200.0f) / scale);
 const string title               = "\\$FF0" + Icons::Random + "\\$G Random Favorites";
 
 void Main() {
@@ -127,7 +127,7 @@ void Render() {
                         UI::TableNextColumn();
                         UI::BeginDisabled(getting);
                         string icon = map.favorite ? Icons::Heart : Icons::HeartO;
-                        if (UI::Button(icon + "##" + map.uid, Draw::MeasureString(icon) + vec2(scale * 15.0f, scale * 10.0f))) {
+                        if (UI::Button(icon + "##" + map.uid, UI::MeasureString(icon) + vec2(scale * 15.0f, scale * 10.0f))) {
                             @selectedFavorite = map;
                             startnew(FavoriteToggle);
                         }

@@ -1,6 +1,3 @@
-// c 2024-01-29
-// m 2024-01-30
-
 bool confirmed        = true;
 int  offset           = 0;
 Map@ selectedFavorite;
@@ -12,9 +9,7 @@ void FavoriteAdd() {
     while (!NadeoServices::IsAuthenticated(audienceLive))
         yield();
 
-    Meta::PluginCoroutine@ coro = startnew(NandoRequestWait);
-    while (coro.IsRunning())
-        yield();
+    NandoRequestWait();
 
     Net::HttpRequest@ req = NadeoServices::Post(
         audienceLive,
@@ -53,9 +48,7 @@ void FavoriteRemove() {
     while (!NadeoServices::IsAuthenticated(audienceLive))
         yield();
 
-    Meta::PluginCoroutine@ coro = startnew(NandoRequestWait);
-    while (coro.IsRunning())
-        yield();
+    NandoRequestWait();
 
     Net::HttpRequest@ req = NadeoServices::Post(
         audienceLive,
@@ -126,9 +119,7 @@ void GetFavoriteMaps() {
     while (!NadeoServices::IsAuthenticated(audienceLive))
         yield();
 
-    Meta::PluginCoroutine@ coro = startnew(NandoRequestWait);
-    while (coro.IsRunning())
-        yield();
+    NandoRequestWait();
 
     Net::HttpRequest@ req = NadeoServices::Get(
         audienceLive,
