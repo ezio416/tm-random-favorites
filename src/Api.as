@@ -150,10 +150,16 @@ void GetFavoriteMaps() {
         Json::Value@ parsed = Json::Parse(text);
         Json::Value@ mapList = parsed["mapList"];
 
+        int count = parsed["itemCount"];
+        if (count > 250) {  // todo
+            warn("you have " + count + " favorites - anything added before the last 250 maps can be accessed in a future plugin update");
+        }
+
         maps.RemoveRange(0, maps.Length);
 
         for (uint i = 0; i < mapList.Length; i++) {
             Map@ map = Map(mapList[i]);
+            map.number = count - i;
             maps.InsertLast(map);
 
             if (!accounts.Exists(map.authorId))
@@ -162,10 +168,6 @@ void GetFavoriteMaps() {
 
         GetAccountNames();
 
-        int count = parsed["itemCount"];
-        if (count > 250) {  // todo
-            warn("you have " + count + " favorites - anything added before the last 250 maps can be accessed in a future plugin update");
-        }
     } catch {
         warn("GetFavoriteMaps exception: " + getExceptionInfo());
     }

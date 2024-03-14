@@ -28,3 +28,7 @@ bool S_Hearts = true;
 
 [Setting category="Window" name="Show map names with color"]
 bool S_ColorMapNames = true;
+
+
+[Setting category="Debug" name="Show debug window"]
+bool S_Debug = false;

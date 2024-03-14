@@ -15,8 +15,8 @@ void FilterMaps() {
 
     mapsFiltered.RemoveRange(0, mapsFiltered.Length);
 
-    for (uint i = 0; i < maps.Length; i++) {
-        Map@ map = maps[i];
+    for (uint i = 0; i < mapsSorted.Length; i++) {
+        Map@ map = mapsSorted[i];
         const string authorName = accounts.Exists(map.authorId) ? string(accounts[map.authorId]) : "";
 
         if (

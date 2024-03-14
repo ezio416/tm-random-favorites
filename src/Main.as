@@ -12,6 +12,7 @@ bool         loadingMap          = false;
 Map@[]       maps;
 string       mapSearch;
 Map@[]       mapsFiltered;
+Map@[]       mapsSorted;
 bool         permissionPlayLocal = false;
 float        scale               = 1.0f;
 const string title               = "\\$FF0" + Icons::Random + "\\$G Random Favorites";
@@ -110,19 +111,57 @@ void Render() {
 
         UI::Text("Click a map name to play it:");
 
-        if (UI::BeginTable("##map-table", S_Hearts ? 7 : 6, UI::TableFlags::RowBg | UI::TableFlags::ScrollY)) {
+        if (UI::BeginTable("##map-table", S_Hearts ? 8 : 7, UI::TableFlags::RowBg | UI::TableFlags::ScrollY | UI::TableFlags::Sortable)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, vec4(0.0f, 0.0f, 0.0f, 0.5f));
 
             UI::TableSetupScrollFreeze(0, 1);
             if (S_Hearts)
-                UI::TableSetupColumn("fav",    UI::TableColumnFlags::WidthFixed, scale * 35.0f);
+                UI::TableSetupColumn("fav",     UI::TableColumnFlags::WidthFixed, scale * 35.0f);
+            UI::TableSetupColumn("#",           UI::TableColumnFlags::WidthFixed, scale * 35.0f);
             UI::TableSetupColumn("name");
-            UI::TableSetupColumn("author",     UI::TableColumnFlags::WidthFixed, scale * 120.0f);
-            UI::TableSetupColumn("authorTime", UI::TableColumnFlags::WidthFixed, scale * 75.0f);
-            UI::TableSetupColumn("goldTime",   UI::TableColumnFlags::WidthFixed, scale * 75.0f);
-            UI::TableSetupColumn("silverTime", UI::TableColumnFlags::WidthFixed, scale * 75.0f);
-            UI::TableSetupColumn("bronzeTime", UI::TableColumnFlags::WidthFixed, scale * 75.0f);
+            UI::TableSetupColumn("author name", UI::TableColumnFlags::WidthFixed, scale * 120.0f);
+            UI::TableSetupColumn("author",      UI::TableColumnFlags::WidthFixed, scale * 75.0f);
+            UI::TableSetupColumn("gold",        UI::TableColumnFlags::WidthFixed, scale * 75.0f);
+            UI::TableSetupColumn("silver",      UI::TableColumnFlags::WidthFixed, scale * 75.0f);
+            UI::TableSetupColumn("bronze",      UI::TableColumnFlags::WidthFixed, scale * 75.0f);
             UI::TableHeadersRow();
+
+            UI::TableSortSpecs@ tableSpecs = UI::TableGetSortSpecs();
+
+            if (tableSpecs !is null && tableSpecs.Dirty) {
+                UI::TableColumnSortSpecs[]@ colSpecs = tableSpecs.Specs;
+
+                if (colSpecs !is null && colSpecs.Length > 0) {
+                    const bool ascending = colSpecs[0].SortDirection == UI::SortDirection::Ascending;
+
+                    int colNumber     = 0;
+                    int colName       = 1;
+                    int colAuthor     = 2;
+                    int colAuthorTime = 3;
+                    int colGoldTime   = 4;
+                    int colSilverTime = 5;
+                    int colBronzeTime = 6;
+
+                    if (S_Hearts) {
+                        colNumber++;
+                        colName++;
+                        colAuthor++;
+                        colAuthorTime++;
+                        colGoldTime++;
+                        colSilverTime++;
+                        colBronzeTime++;
+                    }
+
+                    if (colSpecs[0].ColumnIndex == colNumber)
+                        Sort::sortMethod = ascending ? Sort::SortMethod::EarliestAddedFirst : Sort::SortMethod::LatestAddedFirst;
+                    else if (colSpecs[0].ColumnIndex == colName)
+                        Sort::sortMethod = ascending ? Sort::SortMethod::NameAlpha : Sort::SortMethod::NameAlphaRev;
+
+                    startnew(Sort::Maps);
+                }
+
+                tableSpecs.Dirty = false;
+            }
 
             UI::ListClipper clipper(mapsFiltered.Length);
             while (clipper.Step()) {
@@ -141,6 +180,9 @@ void Render() {
                         }
                         UI::EndDisabled();
                     }
+
+                    UI::TableNextColumn();
+                    UI::Text(tostring(map.number));
 
                     UI::TableNextColumn();
                     UI::BeginDisabled(!permissionPlayLocal || loadingMap);
