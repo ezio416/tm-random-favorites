@@ -1,6 +1,3 @@
-// c 2024-01-29
-// m 2024-01-30
-
 dictionary@  accounts     = dictionary();
 const string audienceLive = "NadeoLiveServices";
 bool         canPlay      = false;
