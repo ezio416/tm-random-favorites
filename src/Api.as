@@ -6,8 +6,9 @@ bool showConfirmation = false;
 void FavoriteAdd() {
     trace("adding favorite map " + selectedFavorite.nameQuoted);
 
-    while (!NadeoServices::IsAuthenticated(audienceLive))
+    while (!NadeoServices::IsAuthenticated(audienceLive)) {
         yield();
+    }
 
     NandoRequestWait();
 
@@ -16,12 +17,16 @@ void FavoriteAdd() {
         NadeoServices::BaseURLLive() + "/api/token/map/favorite/" + selectedFavorite.uid + "/add"
     );
     req.Start();
-    while (!req.Finished())
+    while (!req.Finished()) {
         yield();
+    }
 
     int code = req.ResponseCode();
     string text = req.String();
-    if (code < 200 || code >= 400) {
+    if (false
+        or code < 200
+        or code >= 400
+    ) {
         warn("FavoriteAdd: bad response (" + code + "): " + req.Error() + " " + text);
         return;
     }
@@ -37,16 +42,18 @@ void FavoriteRemove() {
     showConfirmation = true;
 
     while (!confirmed) {
-        if (!showConfirmation)
+        if (!showConfirmation) {
             return;
+        }
 
         yield();
     }
 
     trace("removing favorite map " + selectedFavorite.nameQuoted);
 
-    while (!NadeoServices::IsAuthenticated(audienceLive))
+    while (!NadeoServices::IsAuthenticated(audienceLive)) {
         yield();
+    }
 
     NandoRequestWait();
 
@@ -55,12 +62,16 @@ void FavoriteRemove() {
         NadeoServices::BaseURLLive() + "/api/token/map/favorite/" + selectedFavorite.uid + "/remove"
     );
     req.Start();
-    while (!req.Finished())
+    while (!req.Finished()) {
         yield();
+    }
 
     int code = req.ResponseCode();
     string text = req.String();
-    if (code < 200 || code >= 400) {
+    if (false
+        or code < 200
+        or code >= 400
+    ) {
         warn("FavoriteRemove: bad response (" + code + "): " + req.Error() + " " + text);
         return;
     }
@@ -72,15 +83,20 @@ void FavoriteRemove() {
 }
 
 void FavoriteToggle() {
-    if (getting || selectedFavorite is null)
+    if (false
+        or getting
+        or selectedFavorite is null
+    ) {
         return;
+    }
 
     getting = true;
 
-    if (selectedFavorite.favorite)
+    if (selectedFavorite.favorite) {
         FavoriteRemove();
-    else
+    } else {
         FavoriteAdd();
+    }
 
     @selectedFavorite = null;
     getting = false;
@@ -91,33 +107,38 @@ void GetAccountNames() {
 
     string[]@ keys = accounts.GetKeys();
     for (uint i = 0; i < keys.Length; i++) {
-        if (string(accounts[keys[i]]) == "")
+        if (string(accounts[keys[i]]) == "") {
             namesToGet.InsertLast(keys[i]);
+        }
     }
 
-    if (namesToGet.Length == 0)
+    if (namesToGet.Length == 0) {
         return;
+    }
 
     trace("getting names for " + namesToGet.Length + " accounts");
 
     dictionary@ returned = NadeoServices::GetDisplayNamesAsync(namesToGet);
     keys = returned.GetKeys();
-    for (uint i = 0; i < keys.Length; i++)
+    for (uint i = 0; i < keys.Length; i++) {
         accounts[keys[i]] = returned[keys[i]];
+    }
 
     trace("getting names done");
 }
 
 void GetFavoriteMaps() {
-    if (getting)
+    if (getting) {
         return;
+    }
 
     getting = true;
 
     trace("getting favorites");
 
-    while (!NadeoServices::IsAuthenticated(audienceLive))
+    while (!NadeoServices::IsAuthenticated(audienceLive)) {
         yield();
+    }
 
     NandoRequestWait();
 
@@ -126,12 +147,16 @@ void GetFavoriteMaps() {
         NadeoServices::BaseURLLive() + "/api/token/map/favorite?offset=" + offset + "&length=250"
     );
     req.Start();
-    while (!req.Finished())
+    while (!req.Finished()) {
         yield();
+    }
 
     int code = req.ResponseCode();
     string text = req.String();
-    if (code != 200) {
+    if (false
+        or code < 200
+        or code >= 400
+    ) {
         warn("GetFavoriteMaps: bad response (" + code + "): " + req.Error() + " " + text);
         getting = false;
         return;
@@ -141,20 +166,21 @@ void GetFavoriteMaps() {
         Json::Value@ parsed = Json::Parse(text);
         Json::Value@ mapList = parsed["mapList"];
 
-        maps.RemoveRange(0, maps.Length);
+        maps = {};
 
         for (uint i = 0; i < mapList.Length; i++) {
             Map@ map = Map(mapList[i]);
             maps.InsertLast(map);
 
-            if (!accounts.Exists(map.authorId))
+            if (!accounts.Exists(map.authorId)) {
                 accounts[map.authorId] = "";
+            }
         }
 
         GetAccountNames();
 
         int count = parsed["itemCount"];
-        if (count > 250) {  // todo
+        if (count > 250) {  // TODO
             warn("you have " + count + " favorites - anything added before the last 250 maps can be accessed in a future plugin update");
         }
     } catch {

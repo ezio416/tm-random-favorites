@@ -42,8 +42,12 @@ class Map {
 
     // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
     void Play() {
-        if (loadingMap || !permissionPlayLocal)
+        if (false
+            or loadingMap
+            or !permissionPlayLocal
+        ) {
             return;
+        }
 
         loadingMap = true;
 
@@ -51,15 +55,16 @@ class Map {
 
         ReturnToMenu();
 
-        CTrackMania@ App = cast<CTrackMania@>(GetApp());
+        auto App = cast<CTrackMania>(GetApp());
 
         App.ManiaTitleControlScriptAPI.PlayMap(downloadUrl, "TrackMania/TM_PlayMap_Local", "");
 
         const uint64 waitToPlayAgain = 5000;
         const uint64 now = Time::Now;
 
-        while (Time::Now - now < waitToPlayAgain)
+        while (Time::Now - now < waitToPlayAgain) {
             yield();
+        }
 
         loadingMap = false;
     }
@@ -68,7 +73,7 @@ class Map {
         nameRaw = nameRaw.Trim();
         nameClean = Text::StripFormatCodes(nameRaw).Trim();
         nameColored = Text::OpenplanetFormatCodes(nameRaw).Trim();
-        nameQuoted = "\"" + nameClean + "\"";
+        nameQuoted = '"' + nameClean + '"';
     }
 
     Json::Value@ ToJson() {

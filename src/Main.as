@@ -16,31 +16,46 @@ const string title               = "\\$FF0" + Icons::Random + "\\$G Random Favor
 void Main() {
     NadeoServices::AddAudience(audienceLive);
 
-    if (Permissions::PlayLocalMap())
+    if (Permissions::PlayLocalMap()) {
         permissionPlayLocal = true;
-    else {
+    } else {
         warn("Club access required to play maps");
 
-        if (S_NotifyStarter)
+        if (S_NotifyStarter) {
             UI::ShowNotification(title, "Club access is required to play maps, but you can still see the list of your favorites", vec4(1.0f, 0.1f, 0.1f, 0.8f));
+        }
     }
 
     accounts["d2372a08-a8a1-46cb-97fb-23a161d85ad0"] = "Nadeo";
 
-    if (S_Auto)
+    if (S_Auto) {
         startnew(GetFavoriteMaps);
+    }
 }
 
 void RenderMenu() {
     if (UI::BeginMenu(title)) {
-        if (UI::MenuItem(Icons::WindowRestore + " Show window", "", S_Show))
+        if (UI::MenuItem(Icons::WindowRestore + " Show window", "", S_Show)) {
             S_Show = !S_Show;
+        }
 
-        if (UI::MenuItem(Icons::Refresh + " Refresh favorites (" + maps.Length + ")", "", false, !getting))
+        if (UI::MenuItem(Icons::Refresh + " Refresh favorites (" + maps.Length + ")", "", false, !getting)) {
             startnew(GetFavoriteMaps);
+        }
 
-        if (UI::MenuItem(Icons::Play + " Play random map", "", false, !getting && permissionPlayLocal && maps.Length > 0 && !loadingMap))
+        if (UI::MenuItem(
+            Icons::Play + " Play random map",
+            "",
+            false,
+            (true
+                and !getting
+                and permissionPlayLocal
+                and maps.Length > 0
+                and !loadingMap
+            )
+        )) {
             startnew(PlayRandomMap);
+        }
 
         UI::EndMenu();
     }
@@ -49,25 +64,39 @@ void RenderMenu() {
 void Render() {
     RenderConfirmation();
 
-    if (
-        !S_Show ||
-        (S_HideWithGame && !UI::IsGameUIVisible()) ||
-        (S_HideWithOP && !UI::IsOverlayShown())
-    )
+    if (false
+        or !S_Show
+        or (true
+            and S_HideWithGame
+            and !UI::IsGameUIVisible()
+        )
+        or (true
+            and S_HideWithOP
+            and !UI::IsOverlayShown()
+        )
+    ) {
         return;
+    }
 
     UI::SetNextWindowSize(650, 300, UI::Cond::FirstUseEver);
 
-    UI::Begin(title, S_Show, UI::WindowFlags::None);
+    if (UI::Begin(title, S_Show, UI::WindowFlags::None)) {
         UI::BeginDisabled(getting);
-        if (UI::Button(Icons::Refresh + " Refresh favorites (" + maps.Length + ")"))
+        if (UI::Button(Icons::Refresh + " Refresh favorites (" + maps.Length + ")")) {
             startnew(GetFavoriteMaps);
+        }
         UI::EndDisabled();
 
         UI::SameLine();
-        UI::BeginDisabled(getting || !permissionPlayLocal || maps.Length == 0 || loadingMap);
-        if (UI::Button(Icons::Play + " Play random map"))
+        UI::BeginDisabled(false
+            or getting
+            or !permissionPlayLocal
+            or maps.Length == 0
+            or loadingMap
+        );
+        if (UI::Button(Icons::Play + " Play random map")) {
             startnew(PlayRandomMap);
+        }
         UI::EndDisabled();
 
         if (S_MapSearch) {
@@ -75,28 +104,32 @@ void Render() {
 
             if (mapSearch != "") {
                 UI::SameLine();
-                if (UI::Button(Icons::Times + " Clear Search##mapSearchClear"))
+                if (UI::Button(Icons::Times + " Clear Search##mapSearchClear")) {
                     mapSearch = "";
+                }
 
                 UI::SameLine();
                 UI::Text(mapsFiltered.Length + " result" + (mapsFiltered.Length == 1 ? "" : "s"));
             }
-        } else
+        } else {
             mapSearch = "";
+        }
 
         if (S_AuthorSearch) {
             authorSearch = UI::InputText("search authors", authorSearch);
 
             if (authorSearch != "") {
                 UI::SameLine();
-                if (UI::Button(Icons::Times + " Clear Search##authorSearchClear"))
+                if (UI::Button(Icons::Times + " Clear Search##authorSearchClear")) {
                     authorSearch = "";
+                }
 
                 UI::SameLine();
                 UI::Text(mapsFiltered.Length + " result" + (mapsFiltered.Length == 1 ? "" : "s"));
             }
-        } else
+        } else {
             authorSearch = "";
+        }
 
         FilterMaps();
 
@@ -106,8 +139,9 @@ void Render() {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, vec4(0.0f, 0.0f, 0.0f, 0.5f));
 
             UI::TableSetupScrollFreeze(0, 1);
-            if (S_Hearts)
+            if (S_Hearts) {
                 UI::TableSetupColumn("fav",    UI::TableColumnFlags::WidthFixed, scale * 35.0f);
+            }
             UI::TableSetupColumn("name");
             UI::TableSetupColumn("author",     UI::TableColumnFlags::WidthFixed, scale * 120.0f);
             UI::TableSetupColumn("authorTime", UI::TableColumnFlags::WidthFixed, scale * 75.0f);
@@ -135,9 +169,13 @@ void Render() {
                     }
 
                     UI::TableNextColumn();
-                    UI::BeginDisabled(!permissionPlayLocal || loadingMap);
-                    if (UI::Selectable(S_ColorMapNames ? map.nameColored : map.nameClean, false))
+                    UI::BeginDisabled(false
+                        or !permissionPlayLocal
+                        or loadingMap
+                    );
+                    if (UI::Selectable(S_ColorMapNames ? map.nameColored : map.nameClean, false)) {
                         startnew(CoroutineFunc(map.Play));
+                    }
                     UI::EndDisabled();
 
                     UI::TableNextColumn();
@@ -160,17 +198,22 @@ void Render() {
             UI::PopStyleColor();
             UI::EndTable();
         }
+    }
 
     UI::End();
 }
 
 void RenderConfirmation() {
-    if (!showConfirmation || selectedFavorite is null)
+    if (false
+        or !showConfirmation
+        or selectedFavorite is null
+    ) {
         return;
+    }
 
     UI::SetNextWindowPos(confirmWindowX, confirmWindowY);
 
-    UI::Begin(title + " Confirmation", showConfirmation, UI::WindowFlags::NoTitleBar | UI::WindowFlags::AlwaysAutoResize);
+    if (UI::Begin(title + " Confirmation", showConfirmation, UI::WindowFlags::NoTitleBar | UI::WindowFlags::AlwaysAutoResize)) {
         UI::Text("Are you sure you want to remove the\nfollowing map from your favorites?\nIt may be difficult to find again:");
         UI::TextWrapped(selectedFavorite.nameQuoted + "\n");
 
@@ -180,8 +223,10 @@ void RenderConfirmation() {
         }
 
         UI::SameLine();
-        if (UI::ButtonColored("NO", 0.0f, 1.0f, 0.6f, confirmButtonSize))
+        if (UI::ButtonColored("NO", 0.0f, 1.0f, 0.6f, confirmButtonSize)) {
             showConfirmation = false;
+        }
+    }
 
     UI::End();
 }
