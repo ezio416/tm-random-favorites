@@ -7,10 +7,6 @@ Map@[]       maps;
 string       mapSearch;
 Map@[]       mapsFiltered;
 bool         permissionPlayLocal = false;
-const float  scale               = UI::GetScale();
-const vec2   confirmButtonSize   = vec2(scale * 110.0f, scale * 25.0f);
-const int    confirmWindowX      = int((Display::GetWidth() / 2 - confirmButtonSize.x - 19.0f) / scale);
-const int    confirmWindowY      = int((Display::GetHeight() / 2 - 200.0f) / scale);
 const string title               = "\\$FF0" + Icons::Random + "\\$G Random Favorites";
 
 void Main() {
@@ -135,6 +131,8 @@ void Render() {
 
         UI::Text("Click a map name to play it:");
 
+        const float scale = UI::GetScale();
+
         if (UI::BeginTable("##map-table", S_Hearts ? 7 : 6, UI::TableFlags::RowBg | UI::TableFlags::ScrollY)) {
             UI::PushStyleColor(UI::Col::TableRowBgAlt, vec4(0.0f, 0.0f, 0.0f, 0.5f));
 
@@ -211,7 +209,13 @@ void RenderConfirmation() {
         return;
     }
 
-    UI::SetNextWindowPos(confirmWindowX, confirmWindowY);
+    const float scale = UI::GetScale();
+    const vec2 confirmButtonSize = vec2(scale * 110.0f, scale * 25.0f);
+
+    UI::SetNextWindowPos(
+        int((Display::GetWidth() / 2 - confirmButtonSize.x - 19.0f) / scale),
+        int((Display::GetHeight() / 2 - 200.0f) / scale)
+    );
 
     if (UI::Begin(title + " Confirmation", showConfirmation, UI::WindowFlags::NoTitleBar | UI::WindowFlags::AlwaysAutoResize)) {
         UI::Text("Are you sure you want to remove the\nfollowing map from your favorites?\nIt may be difficult to find again:");
