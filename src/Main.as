@@ -71,7 +71,7 @@ void Render() {
         UI::EndDisabled();
 
         if (S_MapSearch) {
-            mapSearch = UI::InputText("search maps", mapSearch, false);
+            mapSearch = UI::InputText("search maps", mapSearch);
 
             if (mapSearch != "") {
                 UI::SameLine();
@@ -85,7 +85,7 @@ void Render() {
             mapSearch = "";
 
         if (S_AuthorSearch) {
-            authorSearch = UI::InputText("search authors", authorSearch, false);
+            authorSearch = UI::InputText("search authors", authorSearch);
 
             if (authorSearch != "") {
                 UI::SameLine();
