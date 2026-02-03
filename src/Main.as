@@ -76,7 +76,7 @@ void Render() {
 
     UI::SetNextWindowSize(650, 300, UI::Cond::FirstUseEver);
 
-    if (UI::Begin(title, S_Show, UI::WindowFlags::None)) {
+    if (UI::Begin(title, S_Show)) {
         UI::BeginDisabled(getting);
         if (UI::Button(Icons::Refresh + " Refresh favorites (" + maps.Length + ")")) {
             startnew(GetFavoriteMaps);
