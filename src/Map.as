@@ -41,7 +41,7 @@ class Map {
     }
 
     // courtesy of "Play Map" plugin - https://github.com/XertroV/tm-play-map
-    void Play() {
+    void PlayAsync() {
         if (false
             or loadingMap
             or !permissionPlayLocal
@@ -53,7 +53,7 @@ class Map {
 
         trace("loading map " + nameQuoted + " for playing");
 
-        ReturnToMenu();
+        ReturnToMenuAsync();
 
         auto App = cast<CTrackMania>(GetApp());
 

@@ -34,7 +34,7 @@ void FilterMaps() {
     }
 }
 
-void NandoRequestWait() {
+void NandoRequestWaitAsync() {
     if (latestNandoRequest == 0) {
         latestNandoRequest = Time::Now;
         return;
@@ -85,11 +85,11 @@ void PlayRandomMap() {
         @map = maps[index];
     }
 
-    map.Play();
+    startnew(CoroutineFunc(map.PlayAsync));
 }
 
 // courtesy of "BetterTOTD" plugin - https://github.com/XertroV/tm-better-totd
-void ReturnToMenu() {
+void ReturnToMenuAsync() {
     auto App = cast<CTrackMania>(GetApp());
 
     if (App.Network.PlaygroundClientScriptAPI.IsInGameMenuDisplayed) {

@@ -25,7 +25,7 @@ void Main() {
     accounts["d2372a08-a8a1-46cb-97fb-23a161d85ad0"] = "Nadeo";
 
     if (S_Auto) {
-        startnew(GetFavoriteMaps);
+        startnew(GetFavoriteMapsAsync);
     }
 }
 
@@ -36,7 +36,7 @@ void RenderMenu() {
         }
 
         if (UI::MenuItem(Icons::Refresh + " Refresh favorites (" + maps.Length + ")", "", false, !getting)) {
-            startnew(GetFavoriteMaps);
+            startnew(GetFavoriteMapsAsync);
         }
 
         if (UI::MenuItem(
@@ -79,7 +79,7 @@ void Render() {
     if (UI::Begin(title, S_Show)) {
         UI::BeginDisabled(getting);
         if (UI::Button(Icons::Refresh + " Refresh favorites (" + maps.Length + ")")) {
-            startnew(GetFavoriteMaps);
+            startnew(GetFavoriteMapsAsync);
         }
         UI::EndDisabled();
 
@@ -161,7 +161,7 @@ void Render() {
                         string icon = map.favorite ? Icons::Heart : Icons::HeartO;
                         if (UI::Button(icon + "##" + map.uid, UI::MeasureString(icon) + vec2(scale * 15.0f, scale * 10.0f))) {
                             @selectedFavorite = map;
-                            startnew(FavoriteToggle);
+                            startnew(FavoriteToggleAsync);
                         }
                         UI::EndDisabled();
                     }
@@ -172,7 +172,7 @@ void Render() {
                         or loadingMap
                     );
                     if (UI::Selectable(S_ColorMapNames ? map.nameColored : map.nameClean, false)) {
-                        startnew(CoroutineFunc(map.Play));
+                        startnew(CoroutineFunc(map.PlayAsync));
                     }
                     UI::EndDisabled();
 

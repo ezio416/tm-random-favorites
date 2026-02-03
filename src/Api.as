@@ -3,14 +3,14 @@ int  offset           = 0;
 Map@ selectedFavorite;
 bool showConfirmation = false;
 
-void FavoriteAdd() {
+void FavoriteAddAsync() {
     trace("adding favorite map " + selectedFavorite.nameQuoted);
 
     while (!NadeoServices::IsAuthenticated(audienceLive)) {
         yield();
     }
 
-    NandoRequestWait();
+    NandoRequestWaitAsync();
 
     Net::HttpRequest@ req = NadeoServices::Post(
         audienceLive,
@@ -37,7 +37,7 @@ void FavoriteAdd() {
     trace("adding favorite map " + selectedFavorite.nameQuoted + " done");
 }
 
-void FavoriteRemove() {
+void FavoriteRemoveAsync() {
     confirmed = false;
     showConfirmation = true;
 
@@ -55,7 +55,7 @@ void FavoriteRemove() {
         yield();
     }
 
-    NandoRequestWait();
+    NandoRequestWaitAsync();
 
     Net::HttpRequest@ req = NadeoServices::Post(
         audienceLive,
@@ -82,7 +82,7 @@ void FavoriteRemove() {
     trace("removing favorite map " + selectedFavorite.nameQuoted + " done");
 }
 
-void FavoriteToggle() {
+void FavoriteToggleAsync() {
     if (false
         or getting
         or selectedFavorite is null
@@ -93,16 +93,16 @@ void FavoriteToggle() {
     getting = true;
 
     if (selectedFavorite.favorite) {
-        FavoriteRemove();
+        FavoriteRemoveAsync();
     } else {
-        FavoriteAdd();
+        FavoriteAddAsync();
     }
 
     @selectedFavorite = null;
     getting = false;
 }
 
-void GetAccountNames() {
+void GetAccountNamesAsync() {
     string[] namesToGet;
 
     string[]@ keys = accounts.GetKeys();
@@ -127,7 +127,7 @@ void GetAccountNames() {
     trace("getting names done");
 }
 
-void GetFavoriteMaps() {
+void GetFavoriteMapsAsync() {
     if (getting) {
         return;
     }
@@ -140,7 +140,7 @@ void GetFavoriteMaps() {
         yield();
     }
 
-    NandoRequestWait();
+    NandoRequestWaitAsync();
 
     Net::HttpRequest@ req = NadeoServices::Get(
         audienceLive,
@@ -177,7 +177,7 @@ void GetFavoriteMaps() {
             }
         }
 
-        GetAccountNames();
+        GetAccountNamesAsync();
 
         int count = parsed["itemCount"];
         if (count > 250) {  // TODO
